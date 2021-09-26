@@ -56,10 +56,10 @@ stolen from https://code.google.com/p/kyle/
 	// k error between 0 and 1 
 	// if lager than 1 we are only evaluating root 
 	// if k == 0 we use direct method
-	float32 Tree::GetK(b2Vec2* cur)
+	float32 Tree::GetK(FVector* cur)
 	{
 		// spread of box
-		b2Vec2 direction;
+		FVector direction;
 		float32 radius = ((midY - minY) * 2);
 	    direction.x = midX - cur->x;
 		direction.y = midY - cur->y;
@@ -77,7 +77,7 @@ stolen from https://code.google.com/p/kyle/
 	}
 
 
-	/*Tree* oldNext(float32 kerror, b2Vec2* cur)
+	/*Tree* oldNext(float32 kerror, FVector* cur)
 	{
 		Tree* ret = NULL;
 		Tree* worker = this;
@@ -86,7 +86,7 @@ stolen from https://code.google.com/p/kyle/
 
 
 	/// find next node after this one (sequence is nw --> ne --> sw --> se --> parent-parent)
-	Tree* Tree::Next(float32 kerror, b2Vec2* cur)
+	Tree* Tree::Next(float32 kerror, FVector* cur)
 	{	
 		Tree* ret = NULL;
 		Tree* worker = this;
@@ -148,17 +148,18 @@ stolen from https://code.google.com/p/kyle/
 			return NULL;	
 	}
 
-	void Tree::UpdateCenterOfMass(b2Vec2* cur, float32 CurMass)
+	void Tree::UpdateCenterOfMass(FVector* cur, float32 CurMass)
 	{
 		float32 NewMass = Mass + CurMass;
 
 		/* arithmetic middle incrementally  */
 		CenterOfMass.x = CenterOfMass.x * Mass / NewMass + cur->x * CurMass / NewMass;
 		CenterOfMass.y = CenterOfMass.y * Mass / NewMass + cur->y * CurMass / NewMass;
+		//TODO: CenterOfMass.z = CenterOfMass.z * Mass / NewMass + cur->z * CurMass / NewMass;
 		Mass = NewMass;
 	}
 
-	Tree::HandleAndPos* Tree::add(b2Vec2 * cur, const b2ParticleHandle * phP, Tree::HandleAndPos *ptHPin) {
+	Tree::HandleAndPos* Tree::add(FVector* cur, void* phP, Tree::HandleAndPos* ptHPin) {
 		// TODO: maybe optimizable
 		HandleAndPos* pRes = NULL;
 		
@@ -204,7 +205,7 @@ stolen from https://code.google.com/p/kyle/
 				{										
 					ptHPin = new HandleAndPos;
 					ptHPin->pos = cur;
-					ptHPin->handle = (b2ParticleHandle*)phP;
+					ptHPin->handle = phP;
 				}
 				pRes = ptHPin;
 				particles.push_back(ptHPin); 
@@ -278,7 +279,7 @@ stolen from https://code.google.com/p/kyle/
 		return pRes; // return pointer of partricle for subparticle list of parents
 	}
 
-	void Tree::setup(b2Vec2* all, int32 iParticleCount) 
+	void Tree::setup(FVector* all, int32 iParticleCount) 
 	{
 		int n = iParticleCount;
 		if(n > 0) 
@@ -351,30 +352,35 @@ stolen from https://code.google.com/p/kyle/
 		CenterOfMass.y = 0.f;
 		Mass = 0; 
 
-		destroyBox();
+		
 	}
 
     /* this is a debug function; 
 	it creates the b2bodys around edges of this leef of the 
 	tree called from drawonlythis */
-	void Tree::makeBox()
+	/*void Tree::makeBox()
 	{
 		b2BodyDef bd;
 		m_debugBody = m_world->CreateBody(&bd);
 		m_debugBody->SetActive(false);
 		b2ChainShape shape;
-		const b2Vec2 vertices[4] = {
-			b2Vec2(minX, minY),
-			b2Vec2(maxX, minY),
-			b2Vec2(maxX, maxY),
-			b2Vec2(minX, maxY)};
-		shape.CreateLoop(vertices, 4);
+		const FVector vertices[4] = {
+			FVector(minX, minY, maxZ),
+			FVector(maxX, minY, maxZ),
+			FVector(maxX, maxY, maxZ),
+			FVector(minX, maxY, maxZ)
+			FVector(minX, minY, minZ),
+			FVector(maxX, minY, minZ),
+			FVector(maxX, maxY, minZ),
+			FVector(minX, maxY, minZ)};
+		
+		shape.CreateLoop(vertices, 4);  
 		m_debugBody->CreateFixture(&shape, 0.0f); 
-	}
+	}*/ 
 	
     /* this is a debug function; 
 	it draws a debugbodys around the edges of the tree recursifly */
-	void Tree::draw(b2World* m_world) {
+	/*void Tree::draw(b2World* m_world) {
 		this->m_world = m_world;
 		destroyBox();
 		if(nParticles)
@@ -387,4 +393,4 @@ stolen from https://code.google.com/p/kyle/
 			sw->draw( m_world);
 			se->draw( m_world);
 		}
-	}
+	}*/

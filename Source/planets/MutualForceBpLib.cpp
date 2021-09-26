@@ -1,35 +1,32 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "MutualForceBpLib.h"
-#include "b2MutualForceController.h"
 
+
+UMutualForceBpLib::~UMutualForceBpLib()
+{
+	//Remove attached bodies
+    printf("in cpp this UMutualForceBpLib destructor \n");
+	//Clear();
+    //printf("start in cpp this UMutualForceBpLib constructor \n");
+}
 
 UMutualForceBpLib::UMutualForceBpLib()
 {
 	// constructor
-	m_group = NULL;
 	m_stepCount = 0;
 	m_tree = new Tree;
 	m_particleSystem = NULL;
-  	// m_radius = 0.025f;
+	m_radius = 0.025f;  // needs to be taken from the objects
 }
 
-
-int UMutualForceBpLib::SomeIntReturningFunction(FString Text, int32 Number, FString& TextOut)
-{
-	int res = 12;
-	return res;
-}
-
-
-// int UMutualForceBpLib::MutualForceFunction(UStaticMeshComponent* obj, FVector Force) {
 void UMutualForceBpLib::AddForceFunction(UStaticMeshComponent* obj, FVector Force) {
 
 	// add force to body
 	obj->AddForce(Force, "None");
 }
 
+/*
 void UMutualForceBpLib::MutualForceFunction(UStaticMeshComponent* obj1, UStaticMeshComponent* obj2) {
 
 	// calc force 
@@ -50,29 +47,27 @@ void UMutualForceBpLib::MutualForceFunction(UStaticMeshComponent* obj1, UStaticM
 	obj1->AddForce(Force, "None");
 	obj2->AddForce(-Force, "None");
 
-}
+}*/
 
 
 void UMutualForceBpLib::Step(/*const b2TimeStep& step*/)
 {
+	//gravitational constant bigG
+	// (TODO:) this should be accassible in from UE 
+	float32 fltOurG = 0.00002f;
 
     int32 iParticleCount =  m_particleSystem->GetParticleCount();	
-	b2Vec2* paHeadPos = m_particleSystem->GetPositionBuffer();
+	FVector* paHeadPos = m_particleSystem->GetPositionBuffer();
 	b2ParticleColor* paColor = m_particleSystem->GetColorBuffer();
-    
-    
-    b2Vec2 vPos;
-    b2Vec2 vDistance;
-    b2Vec2 vForce;
+
+    FVector vPos;
+    FVector vDistance;
+    FVector vForce;
     float32 fltForce;
     float32 fltDistance;
 
-    b2Vec2 CoM;
+    FVector CoM;
     float32 mass;
-    
-    // Constants 
-    //float32 fltMass = 1;
-    float32 fltOurG = 0.00002f;
 
     // once every steps
     if (this->m_stepCount % 1 == 0)
@@ -96,7 +91,7 @@ void UMutualForceBpLib::Step(/*const b2TimeStep& step*/)
         // particle of interest
         vPos = paHeadPos[idx];
         //paColor[idx].Set(255,255,255,128);
-        vForce = b2Vec2(0.0f, 0.0f);
+        vForce = FVector(0.0f, 0.0f, 0,0f);
         float32 k = 0.5f;
 
         //printf("\n %d with \n",idx);
@@ -163,8 +158,8 @@ void UMutualForceBpLib::Step(/*const b2TimeStep& step*/)
     }
 }
 
-
-void UMutualForceBpLib::AddGroup(b2ParticleSystem* particleSystem)
+ /* particleSystem is a StaticMesh Array */
+void UMutualForceBpLib::AddGroup(UStaticMeshComponent* particleSystem)
 {
     this->m_particleSystem = particleSystem;
 }

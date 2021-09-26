@@ -2,8 +2,10 @@
 #include <limits>
 #include <deque>
 
+#include "MutualForceBpLib.generated.h"
+
 //#include "b2Controller.h"
-#include "../../../Box2D/Box2D/Box2D.h"
+// #include "../../../Box2D/Box2D/Box2D.h"
 
 //#define max(x,y) x>=y?x:y
 
@@ -45,8 +47,8 @@ public:
 	
 	struct HandleAndPos
 	{
-		b2ParticleHandle* handle;
-		b2Vec2*           pos;
+		void*          handle;
+		FVector*       pos;
 	};
 
 	int nParticles;
@@ -60,11 +62,11 @@ public:
 	bool hasChildren;
 	Tree *nw, *ne, *sw, *se; 
 	Tree *parent;
-	float minX, minY, midX, midY, maxX, maxY;
+	float minX, minY, midX, midY, maxX, maxY, minZ, maxZ;
 
 	/* used for debug rendering tree */
-	b2World* m_world;
-	b2Body* m_debugBody;
+	// b2World* m_world;     
+	// b2Body* m_debugBody;  // todo 
 	
 	Tree() :
 		nParticles(0),
@@ -97,7 +99,7 @@ public:
 
 	// not in step() please 
 	~Tree() {
-		destroyBox();
+		
 		delParticles();
 		if(hasChildren || nw != NULL) {
 			delete nw; 
@@ -116,10 +118,9 @@ public:
 		midY = (minY + maxY) / 2;
 	}
 
-    
-	/*b2Vec2* GetNewDirection(b2Vec2* ptOrigin)//
+	/*FVector* GetNewDirection(FVector* ptOrigin)//
 	{
-		b2Vec2* ptRes = new b2Vec2;
+		FVector* ptRes = new FVector;
 
 		// direction
 		ptRes->x = midX - ptOrigin->x;
@@ -153,10 +154,10 @@ public:
 	// k error between 0 and 1 
 	// if lager than 1 we are only evaluating root 
 	// if k == 0 we use direct method
-	float32 GetK(b2Vec2* cur);
+	float32 GetK(FVector* cur);
 	
 	/// find next node after this one (sequence is nw --> ne --> sw --> se --> parent-parent)
-	Tree* Next(float32 kerror, b2Vec2* cur);
+	Tree* Next(float32 kerror, FVector* cur);
 
 	std::deque<HandleAndPos*>* GetParticles()
 	{	// member of the tree updatet with each add function
@@ -172,13 +173,13 @@ public:
 			return &particles;
 	}
 
-	void UpdateCenterOfMass(b2Vec2* cur, float32 CurMass);
+	void UpdateCenterOfMass(FVector* cur, float32 CurMass);
 
 	/* add psrticle to the tree */
-	HandleAndPos* add(b2Vec2 * cur, const b2ParticleHandle* phP, HandleAndPos* ptHPin = NULL);
-    
+	HandleAndPos* add(FVector * cur, void* phP, HandleAndPos* ptHPin = NULL);
+
 	/* init measurements */
-	void setup(b2Vec2* all, int32 iParticleCount); 
+	void setup(FVector* all, int32 iParticleCount); 
 
 	/* delete all storage structures in the particle queue */
 	void delParticles()
@@ -205,39 +206,38 @@ public:
 
 	/* this is a debug function; 
 	it draws a single debugbody around the edges of this leef of the tree */
-	void drawonlythis(b2World* m_world) {
+	/*void drawonlythis(b2World* m_world) {
 		this->m_world = m_world;
 		//printf("%f" ,(this->maxX - this->minX ) / (this->maxY - this->minY)); 
 		destroyBox();
 		makeBox();
-	}
+	}*/
 
-    /* this is a debug function; 
+	/* this is a debug function; 
 	it draws a debugbodys around the edges of the tree recursifly */
-	void draw(b2World* m_world);	
+	/*void draw(b2World* m_world);*/	
 
-	b2Vec2 getCenterOfMass(){ return CenterOfMass;}
+	FVector getCenterOfMass(){ return CenterOfMass;}
 	
 private: 
 
-	b2Vec2 CenterOfMass;
+	FVector CenterOfMass;
 
 	/* this is a debug function; 
 	it creates the b2bodys around edges of this leef of the 
 	tree called from drawonlythis */
-	void makeBox();
+	/*void makeBox();*/
 
 	/* this is a debug function; 
 	it deletes the debug body created with makebox called from drawonlythis */
-	void destroyBox()
+	/*void destroyBox()
 	{
 		if(m_debugBody)
-		{	
+		{
 			m_world->DestroyBody(m_debugBody);
 			m_debugBody = NULL;
 		}
-	}
+	}*/
 
 };
 
-class b2DebugDraw {};

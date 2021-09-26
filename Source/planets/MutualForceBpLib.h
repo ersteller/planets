@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Quadtree.h"
 #include "MutualForceBpLib.generated.h"
 
-#include "Quadtree.h"
 
 /**
  * 
@@ -39,6 +39,6 @@ class PLANETS_API UMutualForceBpLib : public UBlueprintFunctionLibrary
  	Tree* m_tree;
  	UStaticMeshComponent* m_particleSystem;
  	float m_radius;
- };
+
 };
 

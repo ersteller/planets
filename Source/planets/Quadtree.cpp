@@ -44,10 +44,10 @@ stolen from https://code.google.com/p/kyle/
 				memcpy(&buff[d], "_sw", 3);
 			else if(w == w->parent->se)
 				memcpy(&buff[d], "_se", 3);
-			else 
-				assert(0);
+			//else 
+				//assert(0);
 			d-=3;
-			assert(d>=0);
+			//assert(d>=0);
 			w = w->parent;
 		}	 
 		return buff;
@@ -56,19 +56,19 @@ stolen from https://code.google.com/p/kyle/
 	// k error between 0 and 1 
 	// if lager than 1 we are only evaluating root 
 	// if k == 0 we use direct method
-	float32 Tree::GetK(FVector* cur)
+	float Tree::GetK(FVector* cur)
 	{
 		// spread of box
 		FVector direction;
-		float32 radius = ((midY - minY) * 2);
-	    direction.x = midX - cur->x;
-		direction.y = midY - cur->y;
-		float32 length = abs(direction.x) + abs(direction.y); // direction.Length(); // this takes 10%of all time direction.Length(); 
+		float radius = ((midY - minY) * 2);
+	    direction.X = midX - cur->X;
+		direction.Y = midY - cur->Y;
+		float length = abs(direction.X) + abs(direction.Y); // direction.Length(); // this takes 10%of all time direction.Length(); 
 
 
 		// k is an indicator for expectet error impact 
 		// sensable between 0 and 1 if lager than 1 we are very close to or inside this node
-		float32 k = 0;
+		float k = 0;
 		if (length != 0)
 			k = radius / length;
 		else 
@@ -77,7 +77,7 @@ stolen from https://code.google.com/p/kyle/
 	}
 
 
-	/*Tree* oldNext(float32 kerror, FVector* cur)
+	/*Tree* oldNext(float kerror, FVector* cur)
 	{
 		Tree* ret = NULL;
 		Tree* worker = this;
@@ -86,7 +86,7 @@ stolen from https://code.google.com/p/kyle/
 
 
 	/// find next node after this one (sequence is nw --> ne --> sw --> se --> parent-parent)
-	Tree* Tree::Next(float32 kerror, FVector* cur)
+	Tree* Tree::Next(float kerror, FVector* cur)
 	{	
 		Tree* ret = NULL;
 		Tree* worker = this;
@@ -124,8 +124,8 @@ stolen from https://code.google.com/p/kyle/
 				worker = worker->parent->sw;			
 			else if(worker == worker->parent->sw)
 				worker = worker->parent->se;
-			else 
-				assert(0); // did not find itself in the children of parent
+			//else 
+				//assert(0); // did not find itself in the children of parent
 			
 
 			while (worker->hasChildren && worker->GetK(cur) > kerror)
@@ -148,14 +148,14 @@ stolen from https://code.google.com/p/kyle/
 			return NULL;	
 	}
 
-	void Tree::UpdateCenterOfMass(FVector* cur, float32 CurMass)
+	void Tree::UpdateCenterOfMass(FVector* cur, float CurMass)
 	{
-		float32 NewMass = Mass + CurMass;
+		float NewMass = Mass + CurMass;
 
 		/* arithmetic middle incrementally  */
-		CenterOfMass.x = CenterOfMass.x * Mass / NewMass + cur->x * CurMass / NewMass;
-		CenterOfMass.y = CenterOfMass.y * Mass / NewMass + cur->y * CurMass / NewMass;
-		//TODO: CenterOfMass.z = CenterOfMass.z * Mass / NewMass + cur->z * CurMass / NewMass;
+		CenterOfMass.X = CenterOfMass.X * Mass / NewMass + cur->X * CurMass / NewMass;
+		CenterOfMass.Y = CenterOfMass.Y * Mass / NewMass + cur->Y * CurMass / NewMass;
+		//TODO: CenterOfMass.Z = CenterOfMass.Z * Mass / NewMass + cur->Z * CurMass / NewMass;
 		Mass = NewMass;
 	}
 
@@ -165,9 +165,9 @@ stolen from https://code.google.com/p/kyle/
 		
 		if(hasChildren) 
 		{
-			if(cur->x < midX) 
+			if(cur->X < midX) 
 			{
-				if(cur->y < midY) 
+				if(cur->Y < midY) 
 				{
 					pRes = nw->add(cur, phP, ptHPin);
 				} 
@@ -178,7 +178,7 @@ stolen from https://code.google.com/p/kyle/
 			} 
 			else 
 			{
-				if(cur->y < midY) 
+				if(cur->Y < midY) 
 				{
 					pRes = ne->add(cur, phP, ptHPin);
 				} 
@@ -194,7 +194,7 @@ stolen from https://code.google.com/p/kyle/
 			/* update center of mass */
 			if(ptHPin == NULL)
 			{  // so this is a new/unknown particle (not moved to children from parent)
-				float32 CurMass = 1; //TODO: mass of this particle may be individuel
+				float CurMass = 1; //TODO: mass of this particle may be individuel
 				UpdateCenterOfMass(cur, CurMass);
 			}
 		} 
@@ -212,7 +212,7 @@ stolen from https://code.google.com/p/kyle/
 				nParticles++;
 				
 				{ 
-				    float32 CurMass = 1; //TODO: mass of this particle may be individuel
+				    float CurMass = 1; //TODO: mass of this particle may be individuel
 				    UpdateCenterOfMass(cur, CurMass);
 			    }
 
@@ -271,7 +271,7 @@ stolen from https://code.google.com/p/kyle/
 					particles.pop_front();
 					nParticles--;
 				}
-				assert(nParticles == 0);
+				//assert(nParticles == 0);
 				// finally adding the current particle now reentering to add to correct child 
 				pRes = add(cur, phP);
 			}
@@ -285,21 +285,21 @@ stolen from https://code.google.com/p/kyle/
 		if(n > 0) 
 		{
 			// find boundaries
-			minX = all[0].x;
-			minY = all[0].y;
+			minX = all[0].X;
+			minY = all[0].Y;
 			maxX = minX;
 			maxY = minY;
 
 			for(int i = 0; i < n; i++) 
 			{
-				if(all[i].x < minX)
-					minX = all[i].x;
-				if(all[i].y < minY)
-					minY = all[i].y;
-				if(all[i].x > maxX)
-					maxX = all[i].x;
-				if(all[i].y > maxY)
-					maxY = all[i].y;
+				if(all[i].X < minX)
+					minX = all[i].X;
+				if(all[i].Y < minY)
+					minY = all[i].Y;
+				if(all[i].X > maxX)
+					maxX = all[i].X;
+				if(all[i].Y > maxY)
+					maxY = all[i].Y;
 			}
 
 			// center and square boundaries
@@ -348,8 +348,8 @@ stolen from https://code.google.com/p/kyle/
 		subparticles.clear();
 		nSubParticles = 0;
 
-		CenterOfMass.x = 0.f;
-		CenterOfMass.y = 0.f;
+		CenterOfMass.X = 0.f;
+		CenterOfMass.Y = 0.f;
 		Mass = 0; 
 
 		

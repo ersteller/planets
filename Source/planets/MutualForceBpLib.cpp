@@ -54,20 +54,20 @@ void UMutualForceBpLib::Step(/*const b2TimeStep& step*/)
 {
 	//gravitational constant bigG
 	// (TODO:) this should be accassible in from UE 
-	float32 fltOurG = 0.00002f;
+	float fltOurG = 0.00002f;
 
     int32 iParticleCount =  m_particleSystem->GetParticleCount();	
 	FVector* paHeadPos = m_particleSystem->GetPositionBuffer();
-	b2ParticleColor* paColor = m_particleSystem->GetColorBuffer();
+	// b2ParticleColor* paColor = m_particleSystem->GetColorBuffer();
 
     FVector vPos;
     FVector vDistance;
     FVector vForce;
-    float32 fltForce;
-    float32 fltDistance;
+    float fltForce;
+    float fltDistance;
 
     FVector CoM;
-    float32 mass;
+    float mass;
 
     // once every steps
     if (this->m_stepCount % 1 == 0)
@@ -92,12 +92,12 @@ void UMutualForceBpLib::Step(/*const b2TimeStep& step*/)
         vPos = paHeadPos[idx];
         //paColor[idx].Set(255,255,255,128);
         vForce = FVector(0.0f, 0.0f, 0,0f);
-        float32 k = 0.5f;
+        float k = 0.5f;
 
         //printf("\n %d with \n",idx);
 
         int iterations = 0;
-        // float32 seenmass = 0;  // debug help
+        // float seenmass = 0;  // debug help
         for (Tree* it = m_tree->iterator()->Next(k,&vPos);
             it != NULL;
             it = it->Next(k,&vPos))
@@ -141,7 +141,7 @@ void UMutualForceBpLib::Step(/*const b2TimeStep& step*/)
 
         /*printf("  %f Force \n",vForce.Length());*/
 
-        /*float32 force = vForce.Length();
+        /*float force = vForce.Length();
         if (force > 0.1)
         {
               // color high force

@@ -2,7 +2,8 @@
 #include <limits>
 #include <deque>
 
-#include "MutualForceBpLib.generated.h"
+#include "Math/Vector.h"  // for FVector
+// #include "MutualForceBpLib.generated.h"
 
 //#include "b2Controller.h"
 // #include "../../../Box2D/Box2D/Box2D.h"
@@ -57,7 +58,7 @@ public:
 	std::deque<HandleAndPos*> subparticles;
 	std::deque<HandleAndPos*>* ptmpparticles;
 
-	float32 Mass;
+	float Mass;
 
 	bool hasChildren;
 	Tree *nw, *ne, *sw, *se; 
@@ -72,10 +73,9 @@ public:
 		nParticles(0),
 		nSubParticles(0),
 		hasChildren(false),
-		CenterOfMass(0.f,0.f),
+		CenterOfMass(0.f,0.f,0.f,0.f),
 		Mass(0),
 		parent(NULL),
-		m_debugBody(NULL),
 		nw(NULL),ne(NULL),
 		sw(NULL),se(NULL),
 		minX(0), minY(0),
@@ -86,10 +86,9 @@ public:
 		nParticles(0),
 		nSubParticles(0),
 		hasChildren(false),
-		CenterOfMass(0.f,0.f),
+		CenterOfMass(0.f,0.f,0.f,0.f),
 		Mass(0),
 		parent(pparent),
-		m_debugBody(NULL),
 		nw(NULL),ne(NULL),
 		sw(NULL),se(NULL),
 		minX(_minX), minY(_minY),
@@ -123,8 +122,8 @@ public:
 		FVector* ptRes = new FVector;
 
 		// direction
-		ptRes->x = midX - ptOrigin->x;
-		ptRes->y = midY - ptOrigin->y;
+		ptRes->X = midX - ptOrigin->X;
+		ptRes->Y = midY - ptOrigin->Y;
 		return ptRes;
 	}*/
 
@@ -154,10 +153,10 @@ public:
 	// k error between 0 and 1 
 	// if lager than 1 we are only evaluating root 
 	// if k == 0 we use direct method
-	float32 GetK(FVector* cur);
+	float GetK(FVector* cur);
 	
 	/// find next node after this one (sequence is nw --> ne --> sw --> se --> parent-parent)
-	Tree* Next(float32 kerror, FVector* cur);
+	Tree* Next(float kerror, FVector* cur);
 
 	std::deque<HandleAndPos*>* GetParticles()
 	{	// member of the tree updatet with each add function
@@ -165,7 +164,7 @@ public:
 		{ 
 			if (!subparticles.size())
 			{ // try to avoid collecting child particles too many times
-				assert(0); // we should have suparticles traked by add function
+				//assert(0); // we should have suparticles traked by add function
 			}
 			return &subparticles;
 		}
@@ -173,7 +172,7 @@ public:
 			return &particles;
 	}
 
-	void UpdateCenterOfMass(FVector* cur, float32 CurMass);
+	void UpdateCenterOfMass(FVector* cur, float CurMass);
 
 	/* add psrticle to the tree */
 	HandleAndPos* add(FVector * cur, void* phP, HandleAndPos* ptHPin = NULL);

@@ -21,6 +21,34 @@ stolen from https://code.google.com/p/kyle/
 */
 
 
+/*
+an illustration of the north-east-top naming system 
+this is not visible from outside
+    ┌──────────────────────────► X
+   /│                             
+  / │           ┌───────┬───────┐
+ /  │          /│       │       │
+Z   │         / │   nwb │   neb │
+    │        /  │       │       │
+    │       /   ├───────┼───────┤
+    │      /    │       │       │
+    │     /     │   swb │   seb │
+    │    /      │       │       │
+  Y ▼   /       └───────┴───────┘
+       /                       /
+      ┌───────┬───────┐       /
+      │       │       │      /
+      │   nwt │   net │     /
+      │       │       │    /
+      ├───────┼───────┤   /
+      │       │       │  /
+      │   swt │   set │ /
+      │       │       │/
+      └───────┴───────┘
+
+*/
+
+
 
 
 /* TODO: define qoutient s/d (spread / distance) to conditionally use above*/
@@ -32,21 +60,29 @@ stolen from https://code.google.com/p/kyle/
 	char* Tree::getAncestors(char* buff)
 	{
 		Tree* w = this;
-		int d = GetDepth() * 3;
-		memcpy(&buff[0], " ro", 3);
+		int d = GetDepth() * 4;
+		memcpy(&buff[0], " roo", 4);
 		while (w->parent != NULL)
 		{
-			if(w == w->parent->nw)
-				memcpy(&buff[d], "_nw", 3);
-			else if(w == w->parent->ne)
-				memcpy(&buff[d], "_ne", 3);		
-			else if(w == w->parent->sw)
-				memcpy(&buff[d], "_sw", 3);
-			else if(w == w->parent->se)
-				memcpy(&buff[d], "_se", 3);
+			if(w == w->parent->nwt)
+				memcpy(&buff[d], "_nwt", 4);
+			else if(w == w->parent->net)
+				memcpy(&buff[d], "_net", 4);		
+			else if(w == w->parent->swt)
+				memcpy(&buff[d], "_swt", 4);
+			else if(w == w->parent->set)
+				memcpy(&buff[d], "_set", 4);
+			else if(w == w->parent->nwb)
+				memcpy(&buff[d], "_nwb", 4);
+			else if(w == w->parent->neb)
+				memcpy(&buff[d], "_neb", 4);
+			else if(w == w->parent->swb)
+				memcpy(&buff[d], "_swb", 4);
+			else if(w == w->parent->seb)
+				memcpy(&buff[d], "_seb", 4);
 			//else 
 				//assert(0);
-			d-=3;
+			d-=4;
 			//assert(d>=0);
 			w = w->parent;
 		}	 
@@ -54,17 +90,18 @@ stolen from https://code.google.com/p/kyle/
 	}
 
 	// k error between 0 and 1 
-	// if lager than 1 we are only evaluating root 
-	// if k == 0 we use direct method
+	// if lager than 1 we are only evaluating root      (100% error)
+	// if k == 0 we use direct method and evaluate O^n  (0% error)
 	float Tree::GetK(FVector* cur)
 	{
 		// spread of box
 		FVector direction;
-		float radius = ((midY - minY) * 2);
+		float radius = ((midY - minY) * 2);  // this is an aproximation for the width of the element
 	    direction.X = midX - cur->X;
 		direction.Y = midY - cur->Y;
-		float length = abs(direction.X) + abs(direction.Y); // direction.Length(); // this takes 10%of all time direction.Length(); 
-
+		direction.Z = midZ - cur->Z;
+		// this is an approximation for the distance between us and the diameter of the
+		float length = abs(direction.X) + abs(direction.Y) + abs(direction.Z); // direction.Length(); // this takes 10%of all time direction.Length(); 
 
 		// k is an indicator for expectet error impact 
 		// sensable between 0 and 1 if lager than 1 we are very close to or inside this node
@@ -77,15 +114,7 @@ stolen from https://code.google.com/p/kyle/
 	}
 
 
-	/*Tree* oldNext(float kerror, FVector* cur)
-	{
-		Tree* ret = NULL;
-		Tree* worker = this;
-		return NULL;
-	}*/
-
-
-	/// find next node after this one (sequence is nw --> ne --> sw --> se --> parent-parent)
+	/// find next node after this one (sequence is nwt --> net --> swt --> set --> nwb --> neb --> swb --> seb -->  parent-parent)
 	Tree* Tree::Next(float kerror, FVector* cur)
 	{	
 		Tree* ret = NULL;
@@ -97,7 +126,7 @@ stolen from https://code.google.com/p/kyle/
 			while (worker->hasChildren && worker->GetK(cur) > kerror)
 			{
 				// we should go deeper
-				worker = worker->nw;
+				worker = worker->nwt;
 			}
 			// we are now at the correct level
 			// skip border nodes
@@ -108,22 +137,30 @@ stolen from https://code.google.com/p/kyle/
 			return ret;
 		}
 
-		while (worker->parent != NULL && worker == worker->parent->se )
+
+		while (worker->parent != NULL && worker == worker->parent->seb )
 		{
 			// at the end of children go up
 			worker = worker->parent; 
 			// and one more next to the side 
 		}
 				
+		// sequence is nwt-->net-->swt-->set-->nwb-->neb-->swb-->seb-->parent-parent
 		// get next of same layer 
 		if (worker->parent != NULL)
 		{
-			if(worker == worker->parent->nw)
-				worker = worker->parent->ne;
-			else if(worker == worker->parent->ne)
-				worker = worker->parent->sw;			
-			else if(worker == worker->parent->sw)
-				worker = worker->parent->se;
+			if(worker == worker->parent->nwt)
+				worker = worker->parent->net;
+			else if(worker == worker->parent->net)
+				worker = worker->parent->swt;			
+			else if(worker == worker->parent->swt)
+				worker = worker->parent->set;
+			else if (worker == worker->parent->set)
+				worker = worker->parent->neb;
+			else if (worker == worker->parent->neb)
+				worker = worker->parent->swb;
+			else if (worker == worker->parent->swb)
+				worker = worker->parent->seb;
 			//else 
 				//assert(0); // did not find itself in the children of parent
 			
@@ -131,7 +168,7 @@ stolen from https://code.google.com/p/kyle/
 			while (worker->hasChildren && worker->GetK(cur) > kerror)
 			{
 				// we should go deeper
-				worker = worker->nw;
+				worker = worker->nwt;
 			}
 			// we are now at the correct level
 			// skip border nodes
@@ -155,7 +192,7 @@ stolen from https://code.google.com/p/kyle/
 		/* arithmetic middle incrementally  */
 		CenterOfMass.X = CenterOfMass.X * Mass / NewMass + cur->X * CurMass / NewMass;
 		CenterOfMass.Y = CenterOfMass.Y * Mass / NewMass + cur->Y * CurMass / NewMass;
-		//TODO: CenterOfMass.Z = CenterOfMass.Z * Mass / NewMass + cur->Z * CurMass / NewMass;
+		CenterOfMass.Z = CenterOfMass.Z * Mass / NewMass + cur->Z * CurMass / NewMass;
 		Mass = NewMass;
 	}
 
@@ -169,22 +206,48 @@ stolen from https://code.google.com/p/kyle/
 			{
 				if(cur->Y < midY) 
 				{
-					pRes = nw->add(cur, phP, ptHPin);
+					if (cur->Z < midZ)
+					{
+						pRes = nwb->add(cur, phP, ptHPin);
+					}
+					else 
+					{
+						pRes = nwt->add(cur, phP, ptHPin);
+					}
 				} 
 				else 
 				{
-					pRes = sw->add(cur, phP, ptHPin);
+					if (cur->Z < midZ)
+					{
+						pRes = swb->add(cur, phP, ptHPin);
+					} else 
+					{
+						pRes = swt->add(cur, phP, ptHPin);
+					}
 				}
 			} 
 			else 
 			{
 				if(cur->Y < midY) 
 				{
-					pRes = ne->add(cur, phP, ptHPin);
+					if (cur->Z < midZ){
+						pRes = neb->add(cur, phP, ptHPin);
+					} 
+					else 
+					{
+						pRes = net->add(cur, phP, ptHPin);
+					}
 				} 
 				else 
 				{
-					pRes = se->add(cur, phP, ptHPin);
+					if (cur->Z < midZ)
+					{
+						pRes = seb->add(cur, phP, ptHPin);
+					} 
+					else 
+					{
+						pRes = set->add(cur, phP, ptHPin);
+					}
 				}
 			}
 			// add the current particle to the subparticle list because we have added it to the child
@@ -202,7 +265,7 @@ stolen from https://code.google.com/p/kyle/
 		{
 			if(nParticles < maxParticles) {
 				if (ptHPin == NULL)
-				{										
+				{
 					ptHPin = new HandleAndPos;
 					ptHPin->pos = cur;
 					ptHPin->handle = phP;
@@ -210,48 +273,93 @@ stolen from https://code.google.com/p/kyle/
 				pRes = ptHPin;
 				particles.push_back(ptHPin); 
 				nParticles++;
-				
-				{ 
-				    float CurMass = 1; //TODO: mass of this particle may be individuel
-				    UpdateCenterOfMass(cur, CurMass);
-			    }
 
-				
+				float CurMass = 1; //TODO: mass of this particle may be individuel
+				UpdateCenterOfMass(cur, CurMass);
+
 			} else {
 
-				if(nw == NULL)
+				if(nwt == NULL)
 				{
-					nw = new Tree(minX, minY, midX, midY, this);
-					ne = new Tree(midX, minY, maxX, midY, this);
-					sw = new Tree(minX, midY, midX, maxY, this);
-					se = new Tree(midX, midY, maxX, maxY, this);
+					// float _minX, float _minY, float _minZ, float _maxX, float _maxY, float _maxZ, Tree* pparent
+					nwt = new Tree(minX, midX, minY, midY, midZ, maxZ, this);
+					net = new Tree(midX, maxX, minY, midY, midZ, maxZ, this);
+					swt = new Tree(minX, midX, midY, maxY, midZ, maxZ, this);
+					set = new Tree(midX, maxX, midY, maxY, midZ, maxZ, this);
+
+					nwb = new Tree(minX, midX, minY, midY, minZ, midZ, this);
+					neb = new Tree(midX, maxX, minY, midY, minZ, midZ, this);
+					swb = new Tree(minX, midX, midY, maxY, minZ, midZ, this);
+					seb = new Tree(midX, maxX, midY, maxY, minZ, midZ, this);
 				}
 				else
 				{ 
 					/* only update positions*/
-					nw->minX = minX;
-					nw->minY = minY;
-					nw->maxX = midX;
-					nw->maxY = midY;
-					nw->setMid();
+					// top
+					nwt->minX = minX;
+					nwt->minY = minY;
+					nwt->maxX = midX;
+					nwt->maxY = midY;
+					nwt->minZ = midZ;
+					nwt->maxZ = maxZ;
+					nwt->setMid();
 
-					ne->minX = midX;
-					ne->minY = minY;
-					ne->maxX = maxX;
-					ne->maxY = midY;
-					ne->setMid();
+					net->minX = midX;
+					net->minY = minY;
+					net->maxX = maxX;
+					net->maxY = midY;
+					net->minZ = midZ;
+					net->maxZ = maxZ;
+					net->setMid();
 
-					sw->minX = minX;
-					sw->minY = midY;
-					sw->maxX = midX;
-					sw->maxY = maxY;
-					sw->setMid();
+					swt->minX = minX;
+					swt->minY = midY;
+					swt->maxX = midX;
+					swt->maxY = maxY;
+					swt->minZ = midZ;
+					swt->maxZ = maxZ;
+					swt->setMid();
 
-					se->minX = midX;
-					se->minY = midY;
-					se->maxX = maxX;
-					se->maxY = maxY;
-					se->setMid();
+					set->minX = midX;
+					set->minY = midY;
+					set->maxX = maxX;
+					set->maxY = maxY;
+					set->minZ = midZ;
+					set->maxZ = maxZ;
+					set->setMid();
+
+					// bottom
+					nwb->minX = minX;
+					nwb->minY = minY;
+					nwb->maxX = midX;
+					nwb->maxY = midY;
+					nwb->minZ = minZ;
+					nwb->maxZ = midZ;
+					nwb->setMid();
+
+					neb->minX = midX;
+					neb->minY = minY;
+					neb->maxX = maxX;
+					neb->maxY = midY;
+					neb->minZ = minZ;
+					neb->maxZ = midZ;
+					neb->setMid();
+
+					swb->minX = minX;
+					swb->minY = midY;
+					swb->maxX = midX;
+					swb->maxY = maxY;
+					swb->minZ = minZ;
+					swb->maxZ = midZ;
+					swb->setMid();
+
+					seb->minX = midX;
+					seb->minY = midY;
+					seb->maxX = maxX;
+					seb->maxY = maxY;
+					seb->minZ = minZ;
+					seb->maxZ = midZ;
+					seb->setMid();
 				}
 				hasChildren = true;
 
@@ -284,11 +392,15 @@ stolen from https://code.google.com/p/kyle/
 		int n = iParticleCount;
 		if(n > 0) 
 		{
-			// find boundaries
+			// find boundaries 
+			// we just init with the first 
 			minX = all[0].X;
 			minY = all[0].Y;
+			minZ = all[0].Z;
 			maxX = minX;
 			maxY = minY;
+			maxZ = minZ;
+			
 
 			for(int i = 0; i < n; i++) 
 			{
@@ -296,22 +408,30 @@ stolen from https://code.google.com/p/kyle/
 					minX = all[i].X;
 				if(all[i].Y < minY)
 					minY = all[i].Y;
+				if(all[i].Z < minZ)
+					minZ = all[i].Z;
 				if(all[i].X > maxX)
 					maxX = all[i].X;
 				if(all[i].Y > maxY)
 					maxY = all[i].Y;
+				if(all[i].Z > maxZ)
+					maxZ = all[i].Z;
 			}
 
 			// center and square boundaries
 			setMid();
 			float diffX = maxX - minX;
 			float diffY = maxY - minY;
-			float halfSide = std::max(diffX, diffY) / 2;
+			float diffZ = maxZ - minZ;
+
+			// find largest dimension
+			float halfSide = std::max(diffX, std::max(diffY, diffZ)) / 2;
 			minX = midX - halfSide;
 			maxX = midX + halfSide;
 			minY = midY - halfSide;
 			maxY = midY + halfSide;
-
+			minZ = midZ - halfSide;
+			maxZ = midZ + halfSide;
 			//draw(); //debugdraw
 		}
 	}
@@ -325,21 +445,33 @@ stolen from https://code.google.com/p/kyle/
 	{
 		if (hasChildren)
 		{
-			nw->cleanup();
-			ne->cleanup();
-			sw->cleanup();
-			se->cleanup();
+			nwt->cleanup();
+			net->cleanup();
+			swt->cleanup();
+			set->cleanup();
+			nwb->cleanup();
+			neb->cleanup();
+			swb->cleanup();
+			seb->cleanup();
 		}
-		else if(nw != NULL)
+		else if(nwt != NULL)
 		{ // in this node no children were required 
-			delete nw;
-			delete ne;
-			delete sw;
-			delete se;
-			nw = NULL;
-			ne = NULL;
-			sw = NULL;
-			se = NULL;
+			delete nwt;
+			delete net;
+			delete swt;
+			delete set;
+			delete nwb;
+			delete neb;
+			delete swb;
+			delete seb;
+			nwt = NULL;
+			net = NULL;
+			swt = NULL;
+			set = NULL;
+			nwb = NULL;
+			neb = NULL;
+			swb = NULL;
+			seb = NULL;
 		}
 
 		delParticles();

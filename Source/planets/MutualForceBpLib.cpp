@@ -56,7 +56,7 @@ void UMutualForceBpLib::Step(/*const b2TimeStep& step*/)
 	// (TODO:) this should be accassible in from UE 
 	float fltOurG = 0.00002f;
 
-    int32 iParticleCount =  m_particleSystem->GetParticleCount();	
+    // int32 iParticleCount =  m_particleSystem->GetParticleCount();	
 	FVector* paHeadPos = m_particleSystem->GetPositionBuffer();
 	// b2ParticleColor* paColor = m_particleSystem->GetColorBuffer();
 
@@ -73,25 +73,26 @@ void UMutualForceBpLib::Step(/*const b2TimeStep& step*/)
     if (this->m_stepCount % 1 == 0)
     {	
         m_tree->cleanup(); 
-        m_tree->setup(paHeadPos, iParticleCount);
+        m_tree->setup(paHeadPos, m_particleCount);
         //printf(" ################## add to tree ");
-        for (int32 idx = 0; idx < iParticleCount; idx++)
+        for (int32 idx = 0; idx < m_particleCount; idx++)
         {
             //printf("%d ",idx);
             
             // printf("now particle add %"PRIx64"\n", (void*)&paHeadPos[idx]);
-            m_tree->add(&paHeadPos[idx], m_particleSystem->GetParticleHandleFromIndex(idx));
+            //m_tree->add(&paHeadPos[idx], m_particleSystem->GetParticleHandleFromIndex(idx));
+            m_tree->add(&paHeadPos[idx], m_particleSystem[idx]);
         }
         //printf("\n\n\n\n");
         // m_tree->draw(m_world);
     }
 
-    for (int32 idx = 0; idx < iParticleCount; idx++)
+    for (int32 idx = 0; idx < m_particleCount; idx++)
     {
         // particle of interest
         vPos = paHeadPos[idx];
         //paColor[idx].Set(255,255,255,128);
-        vForce = FVector(0.0f, 0.0f, 0,0f);
+        vForce = FVector(0.0f, 0.0f, 0.0f);
         float k = 0.5f;
 
         //printf("\n %d with \n",idx);
@@ -159,7 +160,8 @@ void UMutualForceBpLib::Step(/*const b2TimeStep& step*/)
 }
 
  /* particleSystem is a StaticMesh Array */
-void UMutualForceBpLib::AddGroup(UStaticMeshComponent* particleSystem)
+void UMutualForceBpLib::AddGroup(UStaticMeshComponent* particleSystem, int iParticleCount)
 {
     this->m_particleSystem = particleSystem;
+    this->m_particleCount = iParticleCount;
 }

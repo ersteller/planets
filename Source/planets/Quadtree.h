@@ -45,7 +45,7 @@ it should contain all parameters and maybe have some defined interface with a us
 class Tree
 {
 public:
-	
+	// this structure should be generic
 	struct HandleAndPos
 	{
 		void*          handle;
@@ -56,14 +56,13 @@ public:
 	int nSubParticles;
 	std::deque<HandleAndPos*> particles;
 	std::deque<HandleAndPos*> subparticles;
-	std::deque<HandleAndPos*>* ptmpparticles;
 
 	float Mass;
 
 	bool hasChildren;
-	Tree *nw, *ne, *sw, *se; 
+	Tree *nwt, *net, *swt, *set, *nwb, *neb, *swb, *seb; //Noth East South West Top Bottom
 	Tree *parent;
-	float minX, minY, midX, midY, maxX, maxY, minZ, maxZ;
+	float minX, minY, minZ, midX, midY, midZ, maxX, maxY, maxZ;
 
 	/* used for debug rendering tree */
 	// b2World* m_world;     
@@ -72,27 +71,31 @@ public:
 	Tree() :
 		nParticles(0),
 		nSubParticles(0),
-		hasChildren(false),
-		CenterOfMass(0.f,0.f,0.f,0.f),
 		Mass(0),
+		hasChildren(false),
+		nwt(NULL),net(NULL),
+		swt(NULL),set(NULL),
+		nwb(NULL),neb(NULL),
+		swb(NULL),seb(NULL),
 		parent(NULL),
-		nw(NULL),ne(NULL),
-		sw(NULL),se(NULL),
-		minX(0), minY(0),
-		midX(0), midY(0),
-		maxX(0), maxY(0) {
+		minX(0), minY(0), minZ(0),
+		midX(0), midY(0), midZ(0),
+		maxX(0), maxY(0), maxZ(0), 
+		CenterOfMass(0.f,0.f,0.f) {
 	}
-	Tree(float _minX, float _minY, float _maxX, float _maxY, Tree* pparent) :
+	Tree(float _minX, float _maxX, float _minY, float _maxY, float _minZ, float _maxZ, Tree* pparent) :
 		nParticles(0),
 		nSubParticles(0),
-		hasChildren(false),
-		CenterOfMass(0.f,0.f,0.f,0.f),
 		Mass(0),
-		parent(pparent),
-		nw(NULL),ne(NULL),
-		sw(NULL),se(NULL),
-		minX(_minX), minY(_minY),
-		maxX(_maxX), maxY(_maxY) {
+		hasChildren(false),
+		nwt(NULL),net(NULL),
+		swt(NULL),set(NULL),
+		nwb(NULL),neb(NULL),
+		swb(NULL),seb(NULL),
+		minX(_minX), minY(_minY), minZ(_minZ),
+		maxX(_maxX), maxY(_maxY), maxZ(_maxZ),
+		CenterOfMass(0.f,0.f,0.f)
+	{
 		setMid();
 	}
 
@@ -100,21 +103,30 @@ public:
 	~Tree() {
 		
 		delParticles();
-		if(hasChildren || nw != NULL) {
-			delete nw; 
-			delete ne;
-			delete sw;
-			delete se;
-			nw = NULL;
-			ne = NULL;
-			sw = NULL;
-			se = NULL;
+		if(hasChildren || nwt != NULL) {
+			delete nwt; 
+			delete net;
+			delete swt;
+			delete set;
+			delete nwb; 
+			delete neb;
+			delete swb;
+			delete seb;
+			nwt = NULL;
+			net = NULL;
+			swt = NULL;
+			set = NULL;
+			nwb = NULL;
+			neb = NULL;
+			swb = NULL;
+			seb = NULL;
 		}
 	}
 
 	void setMid() {
 		midX = (minX + maxX) / 2;
 		midY = (minY + maxY) / 2;
+		midZ = (minZ + maxZ) / 2;
 	}
 
 	/*FVector* GetNewDirection(FVector* ptOrigin)//

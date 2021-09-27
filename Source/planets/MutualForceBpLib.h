@@ -18,12 +18,12 @@ class PLANETS_API UMutualForceBpLib : public UBlueprintFunctionLibrary
     // public:
 	GENERATED_BODY()
         UFUNCTION(BlueprintCallable, Category = "AaMy Nodes")
-        static void AddForceFunction(UStaticMeshComponent* obj, FVector vect);
+        void AddForceFunction(UStaticMeshComponent* obj, FVector vect);
         
     // GENERATED_BODY()
- 	    static void AddGroup(UStaticMeshComponent* particleSystem);
+ 	    void AddGroup(UStaticMeshComponent* particleSystem, int iParticleCount);
     // GENERATED_BODY()
- 	    static void Step(/*const b2TimeStep& step*/);
+ 	    void Step(/*const b2TimeStep& step*/);
  	UMutualForceBpLib();
  	~UMutualForceBpLib();
 
@@ -35,6 +35,7 @@ class PLANETS_API UMutualForceBpLib : public UBlueprintFunctionLibrary
 
 
  //private:
+    int m_particleCount;
  	int m_stepCount;
  	Tree* m_tree;
  	UStaticMeshComponent* m_particleSystem;

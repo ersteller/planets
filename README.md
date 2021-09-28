@@ -17,8 +17,14 @@
 - [ ] check for dynamic radius
 - [ ] check for dynamic mass
 
+Feature ideas:
+Manipulation Tool (gun slingshot Osmos orbies )
+Preview trace 
+Escaped particles
+Fuse unfuse 
 
-Testing 
+
+Testing:
 - [ ] check impulse preservation
 - [ ] check null pointer 
 

@@ -27,25 +27,30 @@ void UMutualForceBpLib::AddForceFunction(UStaticMeshComponent* obj, FVector Forc
 }
 
 
-void UMutualForceBpLib::MutualForceFunction(UStaticMeshComponent* obj1, UStaticMeshComponent* obj2) {
+float UMutualForceBpLib::MutualForceFunction(UStaticMeshComponent* obj1, UStaticMeshComponent* obj2) {
 
 	// calc force 
-	float G = 1;
-	float m1 = 1;
-	float m2 = 1;
+	float G = 10000;
+
 
 	float r = 700;
 
+    float mass1 = obj1->CalculateMass();
+    float mass2 = obj2->CalculateMass();
 
-	
-	
-	float fForce = G * m1 * m2 / (r * r);
+    FVector pos1 = obj1->GetCenterOfMass();
+    FVector pos2 = obj2->GetCenterOfMass();
 
-	FVector Force = {};
+    FVector direction = pos2 - pos1;
 
+    float fForce = G * mass1 * mass2 / (r * r);
+
+	FVector Force = direction * fForce;
 
 	obj1->AddForce(Force, "None");
 	obj2->AddForce(-Force, "None");
+
+    return fForce;
 
 }
 

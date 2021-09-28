@@ -21,6 +21,7 @@ class PLANETS_API UMutualForceBpLib : public UBlueprintFunctionLibrary
         void AddForceFunction(UStaticMeshComponent* obj, FVector vect);
         
     // GENERATED_BODY()
+        UFUNCTION(BlueprintCallable, Category = "AaMy Nodes")
  	    void AddGroup(UStaticMeshComponent* particleSystem, int iParticleCount);
     // GENERATED_BODY()
  	    void Step(/*const b2TimeStep& step*/);
@@ -28,8 +29,8 @@ class PLANETS_API UMutualForceBpLib : public UBlueprintFunctionLibrary
  	~UMutualForceBpLib();
 
 
-
-    static void MutualForceFunction(UStaticMeshComponent* obj1, UStaticMeshComponent* obj2);
+        UFUNCTION(BlueprintCallable, Category = "AaMy Nodes")
+        static float MutualForceFunction(UStaticMeshComponent* obj1, UStaticMeshComponent* obj2);
 
 
 

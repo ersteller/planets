@@ -26,7 +26,7 @@ void UMutualForceBpLib::AddForceFunction(UStaticMeshComponent* obj, FVector Forc
 	obj->AddForce(Force, "None");
 }
 
-/*
+
 void UMutualForceBpLib::MutualForceFunction(UStaticMeshComponent* obj1, UStaticMeshComponent* obj2) {
 
 	// calc force 
@@ -47,7 +47,7 @@ void UMutualForceBpLib::MutualForceFunction(UStaticMeshComponent* obj1, UStaticM
 	obj1->AddForce(Force, "None");
 	obj2->AddForce(-Force, "None");
 
-}*/
+}
 
 
 void UMutualForceBpLib::Step(/*const b2TimeStep& step*/)
@@ -57,8 +57,11 @@ void UMutualForceBpLib::Step(/*const b2TimeStep& step*/)
 	float fltOurG = 0.00002f;
 
     // int32 iParticleCount =  m_particleSystem->GetParticleCount();	
-	FVector* paHeadPos = m_particleSystem->GetPositionBuffer();
+	FVector* paHeadPos = new FVector(0); // = m_particleSystem->GetPositionBuffer(); TODO:
 	// b2ParticleColor* paColor = m_particleSystem->GetColorBuffer();
+
+    // UPrimitiveComponent::GetMass();
+    //#include "Components/PrimitiveComponent.h"
 
     FVector vPos;
     FVector vDistance;
@@ -81,7 +84,7 @@ void UMutualForceBpLib::Step(/*const b2TimeStep& step*/)
             
             // printf("now particle add %"PRIx64"\n", (void*)&paHeadPos[idx]);
             //m_tree->add(&paHeadPos[idx], m_particleSystem->GetParticleHandleFromIndex(idx));
-            m_tree->add(&paHeadPos[idx], m_particleSystem[idx]);
+            m_tree->add(&paHeadPos[idx], &m_particleSystem[idx] );
         }
         //printf("\n\n\n\n");
         // m_tree->draw(m_world);
@@ -122,7 +125,8 @@ void UMutualForceBpLib::Step(/*const b2TimeStep& step*/)
             CoM = it->getCenterOfMass();
 
             vDistance = CoM - vPos;
-            fltDistance = vDistance.Length();
+
+            fltDistance = vDistance.Dist(CoM,vPos);//  ;vDistance.Dist();
             
             if ( fltDistance < m_radius/2)
             {
@@ -154,7 +158,11 @@ void UMutualForceBpLib::Step(/*const b2TimeStep& step*/)
         }*/
 
         // aply sum of all forces to particle
-        m_particleSystem->ParticleApplyForce( idx, vForce);	
+        // 
+        // 
+        // TODO !!!  m_particleSystem->ParticleApplyForce( idx, vForce);	
+        // 
+        // 
         //printf("iterations %d\n\n",iterations);
     }
 }

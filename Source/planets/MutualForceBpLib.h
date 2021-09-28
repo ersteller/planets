@@ -29,7 +29,7 @@ class PLANETS_API UMutualForceBpLib : public UBlueprintFunctionLibrary
 
 
 
-    //static void MutualForceFunction(UStaticMeshComponent* obj1, UStaticMeshComponent* obj2);
+    static void MutualForceFunction(UStaticMeshComponent* obj1, UStaticMeshComponent* obj2);
 
 
 

@@ -16,6 +16,11 @@ UCLASS()
 class PLANETS_API UMutualForceBpLib : public UBlueprintFunctionLibrary
 {
     // public:
+
+    float m_G = 1000;
+    /*void setBigG(float fG) {
+        this->G = fG;
+    }*/
 	GENERATED_BODY()
         UFUNCTION(BlueprintCallable, Category = "AaMy Nodes")
         void AddForceFunction(UStaticMeshComponent* obj, FVector vect);
@@ -30,7 +35,7 @@ class PLANETS_API UMutualForceBpLib : public UBlueprintFunctionLibrary
 
 
         UFUNCTION(BlueprintCallable, Category = "AaMy Nodes")
-        static float MutualForceFunction(UStaticMeshComponent* obj1, UStaticMeshComponent* obj2);
+        static float MutualForceFunction(UStaticMeshComponent* obj1, UStaticMeshComponent* obj2, float G);
 
 
 

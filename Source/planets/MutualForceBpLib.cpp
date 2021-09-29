@@ -27,13 +27,9 @@ void UMutualForceBpLib::AddForceFunction(UStaticMeshComponent* obj, FVector Forc
 }
 
 
-float UMutualForceBpLib::MutualForceFunction(UStaticMeshComponent* obj1, UStaticMeshComponent* obj2) {
+float UMutualForceBpLib::MutualForceFunction(UStaticMeshComponent* obj1, UStaticMeshComponent* obj2, float G) {
 
 	// calc force 
-	float G = 1000;
-
-
-
     float mass1 = obj1->CalculateMass();
     float mass2 = obj2->CalculateMass();
 
